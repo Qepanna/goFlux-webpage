@@ -27,7 +27,7 @@ By default, all criteria are included: `criteria = c("MAE", "RMSE", "AICc", "SE"
 
 Although linear models have predominantly been used in past NSS chamber applications, the true exchange rate is only linear at the moment of chamber deployment. Indeed, molecular diffusion theory states that chamber feedback leads to declining gradients of the relationship between concentration and time [@livingston2006; @hutchinson1981]. The consequence of using a linear model is that the flux estimate will always underestimate the true flux [@matthias1978; @jury1982; @hüppi2018; @livingston2005; @livingston2006; @anthony1995; @hutchinson2003].
 
-The underestimation in the flux estimate when applying a linear model to inherently nonlinear measurements has long been assumed negligible when measurements appear to be linear [@livingston1995enclosure; @davidson2002], however, this error is not negligible and thus predeployment emission rates estimated with linear models have been systematically and often substantially underestimated in nearly all NSS chamber applications [@matthias1978; @jury1982; @anthony1995; @hutchinson2003; @livingston2005].
+The underestimation in the flux estimate when applying a linear model to inherently non-linear measurements has long been assumed negligible when measurements appear to be linear [@livingston1995enclosure; @davidson2002], however, this error is not negligible and thus pre-deployment emission rates estimated with linear models have been systematically and often substantially underestimated in nearly all NSS chamber applications [@matthias1978; @jury1982; @anthony1995; @hutchinson2003; @livingston2005].
 
 One could argue that using a non-linear model is only valid if one can be sure that there is no physical disturbances caused by the chamber at the moment of deployment, e.g. pressure fluctuations [@conen1998], gas leakage [@livingston2006] or turbulence [@hutchinson2015]. These artefacts may cause a pronounced concentration increase in the chamber at the beginning of the measurement, leading to an overestimation of the flux estimate [@forbrich2010]. However, we argue that poor quality measurements can easily be identified and dealt with, either by modifying the window of observation or removing the measurement. In cases where measurements have an especially poor quality, the `best.flux` function will automatically flag these measurements for quality filtering and select the linear model as the flux best estimate.
 
@@ -63,7 +63,7 @@ In the function `best.flux`, one can choose the linear flux estimate over the no
 
 ### Indices of model fit
 
-In the `best.flux` function, we included multiple choices of indices of model fit, described below. One can choose to include however many of them in the function. If multiple of them are included, the selection of the best model will be made based on a scoring system. Both models start with a score of 0. For each criteria, whichever model performs worst is given +1. After all selected criteria have been evaluated, the model with the lowest score wins. In case of a tie, the non-linear flux estimate is always chosen by default, as non-linearity is assumed.
+In the `best.flux` function, we included multiple choices of indices of model fit, described below. One can choose to include however many of them in the function. If multiple of them are included, the selection of the best model will be made based on a scoring system. Both models start with a score of 0. For each criteria, whichever model performs worst is given +1. After all selected criteria have been evaluated, the model with the lowest score wins. In case of a tie, the non-linear flux estimate is always chosen by default, as non-linearity is assumed. The score is printed in the output data frame in the columns `HM.score` and `LM.score`.
 
 #### Mean Absolute Error (MAE) and Root Mean Square Error (RMSE)
 
@@ -153,7 +153,7 @@ best.flux(
 ### Arguments
 
 |                 |                                                                                                                                                                                                                                                                                           |
-|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|----------------|--------------------------------------------------------|
 | `flux.result`   | data.frame; output from the function `goFlux`.                                                                                                                                                                                                                                            |
 | `criteria`      | character vector; criteria used to assess the goodness of fit of the linear and non-linear flux estimates. Must be at least one the following: "MAE", "RMSE", "AICc", "SE", "g.factor", "kappa", "MDF", "nb.obs", "p-value", or "intercept". The default is all of them.                  |
 | `intercept.lim` | numerical vector of length 2; inferior and superior limits of the intercept (initial concentration; C~0~). Must be the same units as `gastype` in the `goFlux` function. If `intercept.lim = NULL`, the limits are calculated from the true values of C~0~ and C~t~ for each measurement. |
@@ -164,11 +164,11 @@ best.flux(
 
 ### Details
 
-In `criteria`, the indices of model fit "MAE", "RMSE" and "SE" all have a threshold. For MAE and RMSE, the threshold is instrument precision (1σ). For SE, the threshold is the instrument accuracy (1σ/n​). These indices also compare the two models (linear, LM, and non-linear, HM). The selection of the best model based on indices of model fit ("MAE", "RMSE", "AICc" and "SE") is based on a scoring system. Both models start with a score of 0. For each criteria, whichever model performs worst is given +1. After all selected criteria have been evaluated, the model with the lowest score wins. In case of a tie, the non-linear flux estimate is always chosen by default, as non-linearity is assumed.
+In `criteria`, the indices of model fit "MAE", "RMSE" and "SE" all have a threshold. For MAE and RMSE, the threshold is instrument precision (1σ). For SE, the threshold is the instrument accuracy (1σ/n​). These indices also compare the two models (linear, LM, and non-linear, HM). The selection of the best model based on indices of model fit ("MAE", "RMSE", "AICc" and "SE") is based on a scoring system. Both models start with a score of 0. For each criteria, whichever model performs worst is given +1. After all selected criteria have been evaluated, the model with the lowest score wins. In case of a tie, the non-linear flux estimate is always chosen by default, as non-linearity is assumed. The score is printed in the output data frame in the columns `HM.score` and `LM.score`.
 
 The `g.limit` indicates a threshold for the `g.factor`, which is the ratio between a non-linear flux estimate and a linear flux estimate. With the `best.flux` function, one can choose a limit at which the HM model is deemed to overestimate f~0~. Recommended thresholds for the g.factor are \<4 for a flexible threshold, \<2 for a medium threshold, or \<1.25 for a more conservative threshold. The default threshold is `g.limit = 2`. If the g.factor is above the specified threshold, the best flux estimate will switch to LM instead of HM and give a warning in the columns `quality.check` and `HM.diagnose`.
 
-The minimal detectable flux (`MDF`) is calculated from the instrument precision and measurement time. Below the MDF, the flux estimate is considered under the detection limit, but not null. Therefore, the function will not return a 0. There will simply be a warning in the columns `quality.check`, `LM.diagnose` or `HM.diagnose` to warn of a flux estimate under the detection limit. No best flux estimate is chosen based on MDF.
+The minimal detectable flux (`MDF`) is calculated from the instrument precision, the measurement time and the `flux.term`. Below the MDF, the flux estimate is considered under the detection limit, but not null. Therefore, the function will not return a 0. There will simply be a warning in the columns `quality.check`, `LM.diagnose` or `HM.diagnose` to warn of a flux estimate under the detection limit. No best flux estimate is chosen based on MDF.
 
 The parameter kappa determines the curvature of the non-linear regression in the Hutchinson and Mosier model. A maximal limit of kappa, `k.max` is included in the `goFlux` function, so that the non-linear flux estimate cannot exceed this maximum curvature. In the function `best.flux`, one can choose the linear flux estimate over the non-linear flux estimate based on the ratio between kappa and kappa-max (`k.ratio`). The ratio is expressed as a percentage, where 1 indicates `HM.k = k.max`, and 0.5 indicates `HM.k = 0.5*k.max`. The default setting is `k.ratio = 1`. If `HM.k/k.max` is larger than `k.ratio`, a warning is issued in the columns `HM.diagnose` and `quality.check`.
 
@@ -180,14 +180,15 @@ The argument `p.val` is only applicable to the linear flux. Under the defined *p
 
 ### Value
 
-The function returns a data.frame identical to the input `flux.result` with the additional columns `HM.diagnose`, `LM.diagnose`, `best.flux`, `model` and `quality.check`. For each criteria selected, an additional column is also added to specify the limits used for those criteria (e.g. `RMSE.lim`, `p.val.lim`, etc.)
+The function returns a data.frame identical to the input `flux.result` (output from the function `goFlux`) with the additional columns `HM.diagnose`, `LM.diagnose`, `best.flux`, `model` and `quality.check`. For each criteria selected, an additional column is also added to specify the limits used for those criteria (e.g. `RMSE.lim`, `p.val.lim`, etc.)
 
 ### Example
 
 ```{r}
 #| eval: false
-CO2_flux_res <- best.flux(CO2_flux)
-CH4_flux_res <- best.flux(CH4_flux)
+data(LGR_manID)
+CO2_flux <- goFlux(LGR_manID, "CO2dry_ppm")
+CO2_flux_res <- best.flux(CO2_flux, criteria = c("MAE", "AICc", "g.factor", "MDF"))
 ```
 
 ## Save results {#sec-save}
@@ -198,8 +199,6 @@ RData results can be saved as RData, or any data frame can be saved as an Excel 
 #| eval: false
 # Save RData
 save(CO2_flux_res, file = "CO2_flux_res.RData")
-save(CH4_flux_res, file = "CH4_flux_res.RData")
 # Save to Excel
 write.xlsx(CO2_flux_res, file = "CO2_flux_res.xlsx")
-write.xlsx(CH4_flux_res, file = "CH4_flux_res.xlsx")
 ```
