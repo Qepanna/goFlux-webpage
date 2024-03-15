@@ -78,35 +78,64 @@ The function returns a list of plots, one per `UniqueID`, drawn from flux result
 
 ### Example
 
-::: callout-tip
-#### Tip: Combine all gases in one pdf
+```{r}
+#| eval: false
+data(LGR_manID)
 
-The function `flux.plot` creates a list of plots, one per UniqueID. Multiple lists (e.g. one per `gastype`) can be combined to save all plots together with the `flux2pdf` function.
-:::
+# CO2
+CO2_flux <- goFlux(LGR_manID, "CO2dry_ppm")
+CO2_flux_res <- best.flux(CO2_flux, criteria = c("MAE", "AICc", "g.factor", "MDF"))
+CO2_flux_plots <- flux.plot(CO2_flux_res, LGR_manID, "CO2dry_ppm", shoulder=20,
+                            plot.legend = c("MAE", "RMSE", "AICc", "k.ratio", "g.factor"), 
+                            plot.display = c("MDF", "prec", "nb.obs", "flux.term"), 
+                            quality.check = TRUE)
+
+# CH4
+CH4_flux <- goFlux(LGR_manID, "CH4dry_ppm")
+CH4_flux_res <- best.flux(CH4_flux, criteria = c("MAE", "AICc", "g.factor", "MDF"))
+CH4_flux_plots <- flux.plot(CH4_flux_res, LGR_manID, "CH4dry_ppm", shoulder=20,
+                            plot.legend = c("MAE", "RMSE", "AICc", "k.ratio", "g.factor"), 
+                            plot.display = c("MDF", "prec", "nb.obs", "flux.term"), 
+                            quality.check = TRUE)
+```
 
 ::: callout-tip
-To lighten your script, you can define arguments outside a function by storing their value in an object that is then used in the function instead.
+To lighten your script, you can define arguments outside a function by storing their value in an object that is then used in the function instead. However, remember to use the arguments in the same order as they are required in the function.
 
 ```{r}
 #| eval: false
+
+# best.flux
+criteria = c("MAE", "AICc", "g.factor", "MDF")
+
+CO2_flux_res <- best.flux(CO2_flux, criteria)
+CH4_flux_res <- best.flux(CH4_flux, criteria)
+
+# flux.plot 
 plot.legend = c("MAE", "RMSE", "AICc", "k.ratio", "g.factor")
 plot.display = c("MDF", "prec", "nb.obs", "flux.term")
 quality.check = TRUE
+
+CO2_flux_plots <- flux.plot(CO2_flux_res, LGR_manID, "CO2dry_ppm", shoulder=20,
+                            plot.legend, plot.display, quality.check)
+CH4_flux_plots <- flux.plot(CH4_flux_res, LGR_manID, "CH4dry_ppb", shoulder=20,
+                            plot.legend, plot.display, quality.check)
 ```
 
 This trick can help you reduce repetition and mistakes in your script.
 :::
 
+::: callout-tip
+#### Tip: Combine all gases in one pdf
+
+The function `flux.plot` creates a list of plots, one per UniqueID. Multiple lists (e.g. one per `gastype`) can be combined to save all plots together with the `flux2pdf` function.
+
 ```{r}
 #| eval: false
-CO2_flux_plots <- flux.plot(CO2_flux_res, LGR_manID, "CO2dry_ppm", shoulder=20,
-                            plot.legend, plot.display, quality.check)
-CH4_flux_plots <- flux.plot(CH4_flux_res, LGR_manID, "CH4dry_ppb", shoulder=20,
-                            plot.legend, plot.display, quality.check)
-
 # Combine plot lists into one list
 plot.list <- c(CO2_flux_plots, CH4_flux_plots)
 ```
+:::
 
 ## **flux2pdf**
 
