@@ -4,6 +4,7 @@ format:
   html: 
     css: styles.css
 engine: knitr
+editor: visual
 ---
 
 ## Update, update, update

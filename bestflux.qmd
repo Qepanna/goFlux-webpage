@@ -3,6 +3,7 @@ title: "Automatic selection of the best flux estimate"
 format: html
 bibliography: references.bib
 csl: apa-no-initials.csl
+editor: visual
 ---
 
 Following flux calculation, the user can select the best flux estimate (LM or HM) based on objective criteria, using the `best.flux` function:
@@ -186,9 +187,9 @@ The function returns a data.frame identical to the input `flux.result` (output f
 
 ```{r}
 #| eval: false
-data(LGR_manID)
-CO2_flux <- goFlux(LGR_manID, "CO2dry_ppm")
-CO2_flux_res <- best.flux(CO2_flux, criteria = c("MAE", "AICc", "g.factor", "MDF"))
+data(manID.UGGA)
+CO2_flux <- goFlux(manID.UGGA, "CO2dry_ppm")
+CO2_best <- best.flux(CO2_flux, criteria = c("MAE", "AICc", "g.factor", "MDF"))
 ```
 
 ## Save results {#sec-save}
@@ -198,7 +199,7 @@ RData results can be saved as RData, or any data frame can be saved as an Excel 
 ```{r}
 #| eval: false
 # Save RData
-save(CO2_flux_res, file = "CO2_flux_res.RData")
+save(CO2_best, file = "CO2_result.RData")
 # Save to Excel
-write.xlsx(CO2_flux_res, file = "CO2_flux_res.xlsx")
+write.xlsx(CO2_best, file = "CO2_result.xlsx")
 ```

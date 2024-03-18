@@ -4,6 +4,7 @@ format:
   html: 
     css: styles.css
 engine: knitr
+editor: visual
 ---
 
 ```{r}
@@ -30,10 +31,10 @@ If the imported file already contains the column `chamID`, the file is ready for
 file.path <- system.file("extdata", "LI8200/LI8200.json", package = "goFlux")
 
 # Import in the environment
-LI8200_imp <- LI8200_import(inputfile = file.path)
+imp.LI8200 <- import.LI8200(inputfile = file.path)
 
 # Is there a column called chamID in this file?
-any(grepl("chamID", names(LI8200_imp)))
+any(grepl("chamID", names(imp.LI8200)))
 ```
 
 Alternatively, one may want to modify the start and end time even if there are automatic recordings of chamber closure and opening. For example, there might be a delay after chamber closure that needs to be removed (e.g. LI-6400).
@@ -65,10 +66,10 @@ Creating an auxiliary file with date and time can be a pain, especially while us
 
 #### As a text file (.txt)
 
-In this example, the `start.time` for each measurement (`UniqueID`) was noted manually in the field, and are provided in an auxiliary file constructed in Excel and saved as a text file (`LGR_aux.txt`).
+In this example, the `start.time` for each measurement (`UniqueID`) was noted manually in the field, and are provided in an auxiliary file constructed in Excel and saved as a text file (`aux_UGGA.txt`).
 
 ```{r}
-aux.path <- system.file("extdata", "LGR_aux/LGR_aux.txt", package = "goFlux")
+aux.path <- system.file("extdata", "aux_UGGA/aux_UGGA.txt", package = "goFlux")
 auxfile <- read.delim(aux.path) %>% 
   # Use the function as.POSIXct to convert start.time to a POSIXct format
   mutate(start.time = as.POSIXct(start.time, tz = "UTC"))
@@ -84,7 +85,7 @@ auxfile
 It is also possible to load an Excel sheet into R using the function `read_excel` from the package `readxl`.
 
 ```{r}
-aux.path <- system.file("extdata", "LGR_aux/LGR_aux.xlsx", package = "goFlux")
+aux.path <- system.file("extdata", "aux_UGGA/aux_UGGA.xlsx", package = "goFlux")
 auxfile.xlsx <- read_excel(aux.path)
 ```
 
@@ -109,13 +110,13 @@ If field notes did not include the `start.time` of each measurement, it is possi
 ```{r}
 # Retrieve file path from example file in the goFlux package
 # using the function system.file
-file.path <- system.file("extdata", "LGR/LGR.txt", package = "goFlux")
+file.path <- system.file("extdata", "UGGA/UGGA.txt", package = "goFlux")
 
 # Import in the environment
-LGR_imp <- LGR_import(inputfile = file.path)
+imp.UGGA <- import.UGGA(inputfile = file.path)
 
 # Visualise data
-plot(x = LGR_imp$POSIX.time, y = LGR_imp$CO2dry_ppm, # Data
+plot(x = imp.UGGA$POSIX.time, y = imp.UGGA$CO2dry_ppm, # Data
      xlab = "Time", ylab = "CO2dry_ppm", # Labels
      ylim = c(400, 550)) # Plot limits
 ```
@@ -128,17 +129,17 @@ To help visualize the time on the x axis, remove the x axis in the function `plo
 ```{r}
 #| eval: false
 # Visualise data
-plot(x = LGR_imp$POSIX.time, y = LGR_imp$CO2dry_ppm, # Data
+plot(x = imp.UGGA$POSIX.time, y = imp.UGGA$CO2dry_ppm, # Data
      xlab = "Time", ylab = "CO2dry_ppm", # Labels
      ylim = c(400, 550), # Plot limits
      xaxt = 'n') # remove x axis tick marks
 
 # get the right time zone from your data
-time.zone <- attr(LGR_imp$POSIX.time, "tzone")
+time.zone <- attr(imp.UGGA$POSIX.time, "tzone")
 # force axis.POSIXct to use that time zone by changing the system timezone
 Sys.setenv(TZ = time.zone)
 # add the new x axis to the plot
-axis.POSIXct(1, at = seq(min(LGR_imp$POSIX.time), max(LGR_imp$POSIX.time), 
+axis.POSIXct(1, at = seq(min(imp.UGGA$POSIX.time), max(imp.UGGA$POSIX.time), 
                          by = "3 mins"), format = "%H:%M")
 # change the system timezone back to default
 Sys.unsetenv("TZ")
@@ -147,28 +148,28 @@ Sys.unsetenv("TZ")
 
 In this example there are six measurements of approximately three minutes each. Looking at the graph, you can roughly estimate the start time of each measurement:
 
-+------------+------------+-------------+--------------------+
-| Peak\_#    | UniqueID   | start.time\ | start.time\        |
-|            |            | (estimated) | (from field notes) |
-+:==========:+:==========:+:===========:+:==================:+
-| Peak_1     | 733a_C_S   | 12:12:00    | 12:11:00           |
-+------------+------------+-------------+--------------------+
-| Peak_2     | 733a_C_C   | 12:18:00    | 12:17:00           |
-+------------+------------+-------------+--------------------+
-| Peak_3     | 733a_C_E   | 12:23:00    | 12:21:00           |
-+------------+------------+-------------+--------------------+
-| Peak_4     | 733a_B_W   | 12:27:00    | 12:26:00           |
-+------------+------------+-------------+--------------------+
-| Peak_5     | 733a_B_S   | 12:33:00    | 12:31:00           |
-+------------+------------+-------------+--------------------+
-| Peak_6     | 733a_B_E   | 12:37:00    | 12:36:00           |
-+------------+------------+-------------+--------------------+
++-------------+-------------+-------------+--------------------+
+| Peak\_#     | UniqueID    | start.time\ | start.time\        |
+|             |             | (estimated) | (from field notes) |
++:===========:+:===========:+:===========:+:==================:+
+| Peak_1      | 733a_C_S    | 12:12:00    | 12:11:00           |
++-------------+-------------+-------------+--------------------+
+| Peak_2      | 733a_C_C    | 12:18:00    | 12:17:00           |
++-------------+-------------+-------------+--------------------+
+| Peak_3      | 733a_C_E    | 12:23:00    | 12:21:00           |
++-------------+-------------+-------------+--------------------+
+| Peak_4      | 733a_B_W    | 12:27:00    | 12:26:00           |
++-------------+-------------+-------------+--------------------+
+| Peak_5      | 733a_B_S    | 12:33:00    | 12:31:00           |
++-------------+-------------+-------------+--------------------+
+| Peak_6      | 733a_B_E    | 12:37:00    | 12:36:00           |
++-------------+-------------+-------------+--------------------+
 
 In the next step (2), you will define a window of observation for each measurement based on the `start.time`, the observation length (`obs.length`) and some buffer time (`shoulder`) before and after the measurement. Knowing this, it does not matter how exact your estimation is, because you can allow for more buffer before and after the measurement.
 
 ## **2. Define a window of observation for each measurement** {#sec-step2}
 
-In the next step (3), you must click on the start point and the end point of each measurement in a scatter plot to identify the `start.time` and the `end.time`, using the function `click.peak`. Before that, you must create a list of data frame containing one data frame per `UniqueID` using the function `obs.win`. In this example, this step will separate the file `LGR_imp` into a list of 6 data frame.
+In the next step (3), you must click on the start point and the end point of each measurement in a scatter plot to identify the `start.time` and the `end.time`, using the function `click.peak`. Before that, you must create a list of data frame containing one data frame per `UniqueID` using the function `obs.win`. In this example, this step will separate the file `imp.UGGA` into a list of 6 data frame.
 
 The purpose of this step is to zoom in on each measurement in the file to help you identify the start and end time more easily. In order to correctly zoom in on each measurement, you must know the `start.time` (defined in step 1) and the observation length (`obs.length`) of each measurement. In addition, you can define some buffer time around each measurement in case the defined `start.time` is not exact. If the observation length is different for each measurement, use the longest one.
 
@@ -214,8 +215,8 @@ In this example, the observation length was approximately three minutes (180 sec
 
 ```{r}
 #| eval: false
-LGR_ow <- obs.win(inputfile = LGR_imp, auxfile = auxfile,
-                  obs.length = 180, shoulder = 60)
+ow.UGGA <- obs.win(inputfile = imp.UGGA, auxfile = auxfile,
+                   obs.length = 180, shoulder = 60)
 ```
 
 | Peak\_# | UniqueID | start.time | obs.win min | obs.win max |
@@ -243,8 +244,8 @@ Use the argument `pattern` to load only the files that match a pattern.
 my.files <- list.files(path = "RData", pattern = "imp.RData", full.names = TRUE) %>%
   map_df(~ get(load(.x)))
 
-LGR_ow <- obs.win(inputfile = my.files, auxfile = auxfile,
-                  obs.length = 180, shoulder = 60)
+ow.UGGA <- obs.win(inputfile = my.files, auxfile = auxfile,
+                   obs.length = 180, shoulder = 60)
 ```
 :::
 
@@ -318,7 +319,7 @@ In this example, the observation time is 3 minutes (180 seconds) and the shoulde
 ```{r}
 #| eval: false
 # Manually identify measurements by clicking on the start and end points
-LGR_manID <- click.peak(LGR_ow[[2]])
+manID.UGGA <- click.peak(ow.UGGA[[2]])
 ```
 
 ![](images/click.peak1.png){#fig-click.peak1 fig-align="center"}
@@ -331,7 +332,7 @@ Note that for **more than one gas measurement**, it is better to use the functio
 ```{r}
 #| eval: false
 # Manually identify measurements by clicking on the start and end points
-LGR_manID <- lapply(seq_along(LGR_ow), click.peak.loop, flux.unique = LGR_ow) %>%
+manID.UGGA <- lapply(seq_along(ow.UGGA), click.peak.loop, flux.unique = ow.UGGA) %>%
   map_df(., ~as.data.frame(.x))
 ```
 
@@ -340,14 +341,14 @@ If you need to create **multiple loops**, you can simply enumerate a subset of y
 ```{r}
 #| eval: false
 # Create two loops
-LGR_manID.1 <- lapply(c(1:20), click.peak.loop, flux.unique = LGR_ow) %>%
+manID.UGGA.1 <- lapply(c(1:20), click.peak.loop, flux.unique = ow.UGGA) %>%
   map_df(., ~as.data.frame(.x))
 
-LGR_manID.2 <- lapply(c(21:40), click.peak.loop, flux.unique = LGR_ow) %>%
+manID.UGGA.2 <- lapply(c(21:40), click.peak.loop, flux.unique = ow.UGGA) %>%
   map_df(., ~as.data.frame(.x))
 
 # Combine the two objects back into one object
-LGR_manID <- rbind(LGR_manID.1, LGR_manID.2)
+manID.UGGA <- rbind(manID.UGGA.1, manID.UGGA.2)
 ```
 :::
 
