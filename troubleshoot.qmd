@@ -56,7 +56,7 @@ message("Error: Failed to install 'goFlux' from GitHub:
   - Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`.")
 ```
 
-This error can occur while using the package `remotes` to install an R package from GitHub. Try using the package `devtools` instead. If the error still occurs, follow the instructions below.
+This error can occur when a user tries to install R packages too many times in the same day. To avoid this error, only update the package when necessary. To increase your API rate limit, follow the steps below.
 
 #### Step 1: Set up a GitHub account
 
@@ -88,7 +88,7 @@ credentials::set_github_pat("YourTokeninStep2")
 
 ## click.peak based on UniqueID {#sec-click.peak}
 
-How to re-do `click.peak` on one measurement at a time and replace previous click.
+How to re-run `click.peak2` on one measurement at a time and replace previous click.
 
 Here is an example with the UniqueID 733a_C_C from the example data provided with the package.
 
@@ -97,33 +97,33 @@ First, we must find in which position is this UniqueID located in the list of da
 ```{r}
 #| eval: false
 # Create a data frame UniqueID.position that lists the position of each UniqueID
-# in the object LGR_ow
-UniqueID.position <- cbind.data.frame(position = seq(1, length(LGR_ow))) 
-for (i in 1:length(LGR_ow)){
-  UniqueID.position$UniqueID[[i]] <- first(LGR_ow[[i]]$UniqueID)}
+# in the object ow.UGGA
+UniqueID.position <- cbind.data.frame(position = seq(1, length(ow.UGGA))) 
+for (i in 1:length(ow.UGGA)){
+  UniqueID.position$UniqueID[[i]] <- first(ow.UGGA[[i]]$UniqueID)}
 
 # Find the UniqueID 733a_C_C in that data frame
 filter(UniqueID.position, UniqueID == "733a_C_C")
 ```
 
-Then, run a normal `click.peak` on the position found:
+Then, run a normal `click.peak2` on the position found:
 
 ```{r}
 #| eval: false
-new.click <- click.peak(LGR_ow[[2]])
+new.click <- click.peak2(ow.UGGA, seq = 2)
 ```
 
 Load previously saved results, replace this UniqueID, and save the modified file.
 
 ```{r}
 #| eval: false
-load("RData/LGR_manID.RData")
+load("RData/manID.UGGA.RData")
 
-LGR_manID <- LGR_manID %>% 
+manID.UGGA <- manID.UGGA %>% 
   # Remove the previous click
   filter(UniqueID != "733a_C_C") %>% 
   # Add the new click
   rbind(new.click)
 
-save(LGR_manID, file = "RData/LGR_manID.RData")
+save(manID.UGGA, file = "RData/manID.UGGA.RData")
 ```

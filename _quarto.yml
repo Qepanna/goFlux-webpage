@@ -7,9 +7,10 @@ format:
     toc: true
     toc-expand: 1
     toc-depth: 4
-    link-external-icon: true
+    link-external-icon: false
     link-external-newwindow: true
-    link-external-filter: '^mailto:karh@ign.ku.dk|(?:http:|https:)\/\/(?:www\.)*(qepanna\.quarto\.pub|ign\.ku\.dk|novonordiskfonden\.dk|doi\.org|twitter\.com)\/.*$'
+    #link-external-filter: '^mailto:karh@ign.ku.dk|(?:http:|https:)\/\/(?:www\.)*(qepanna\.quarto\.pub|ign\.ku\.dk|novonordiskfonden\.dk|doi\.org|twitter\.com)\/.*$'
+    link-external-filter: '^(?:http:|https:)\/\/(?:www\.)*(qepanna\.quarto\.pub)\/.*$'
     theme:
       - custom.scss
 
@@ -46,5 +47,7 @@ website:
         text: "best.flux"
       - file: flux2pdf.qmd
         text: "Plots"
+      - file: example.qmd
+        text: "Examples"
       - file: troubleshoot.qmd
         text: "Troubleshoot"

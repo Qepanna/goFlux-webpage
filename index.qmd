@@ -12,7 +12,7 @@ csl: apa-numeric-superscript-brackets.csl
 ::: {.callout-warning icon="false"}
 ## FIRST RELEASE
 
-The package is ready to use and fully functional, but errors may still occur. Please report any issues to the maintainer, Karelle Rheault ([karh\@ign.ku.dk](mailto:karh@ign.ku.dk){.email}), including script and raw data if necessary. Thank you for helping me in the development of this tool! 🙏
+The package is ready to use and fully functional, but errors may still occur. Please report any issues directly to the maintainer, Karelle Rheault ([karh\@ign.ku.dk](mailto:karh@ign.ku.dk){.email}), including script and raw data if necessary, or [open an issue on GitHub](https://github.com/Qepanna/goFlux/issues). Thank you for helping me in the development of this tool! 🙏
 :::
 
 ## One Package to rule them all
@@ -40,7 +40,7 @@ Click on the tabs on the sidebar to navigate through each step, or follow the li
 
 1.  [Install the package](install.qmd)
 2.  [Import raw data into R](import.qmd)
-3.  [Identify measurements](manualID.qmd)
+3.  [Identify start and end points of measurements](manualID.qmd)
 4.  [Calculate GHG flux estimates (LM and HM)](goFlux.qmd)
 5.  [Automatically select the best flux estimate](bestflux.qmd)
 6.  [Save results as RData or Excel](bestflux.qmd#sec-save)

@@ -169,7 +169,7 @@ In the next step (2), you will define a window of observation for each measureme
 
 ## **2. Define a window of observation for each measurement** {#sec-step2}
 
-In the next step (3), you must click on the start point and the end point of each measurement in a scatter plot to identify the `start.time` and the `end.time`, using the function `click.peak`. Before that, you must create a list of data frame containing one data frame per `UniqueID` using the function `obs.win`. In this example, this step will separate the file `imp.UGGA` into a list of 6 data frame.
+In the next step (3), you must click on the start point and the end point of each measurement in a scatter plot to identify the `start.time` and the `end.time`, using the function `click.peak2`. Before that, you must create a list of data frame containing one data frame per `UniqueID` using the function `obs.win`. In this example, this step will separate the file `imp.UGGA` into a list of 6 data frames.
 
 The purpose of this step is to zoom in on each measurement in the file to help you identify the start and end time more easily. In order to correctly zoom in on each measurement, you must know the `start.time` (defined in step 1) and the observation length (`obs.length`) of each measurement. In addition, you can define some buffer time around each measurement in case the defined `start.time` is not exact. If the observation length is different for each measurement, use the longest one.
 
@@ -257,40 +257,46 @@ ow.UGGA <- obs.win(inputfile = my.files, auxfile = auxfile,
 message("WARNING! Do not loop through more than 20 measurements at a time to avoid mistakes.", "\nYou have 21 measurements in your dataset.", "\nYou should split the next step into at least 2 loops.")
 ```
 
-In such a case, follow [this tip](manualID.qmd#tip-click.peak.loop) with the function `click.peak.loop`
+In such a case, follow [this tip](manualID.qmd#tip-click.peak.loop) with the function `click.peak2`
 :::
 
 ## **3. Click on a scatter plot to identify start and end times** {#sec-step3}
 
-When running the function `click.peak`, for each measurement, a window will open, in which you must click on the start point and the end point. The observation window is based on the `start.time` given in the `auxfile`, the length of the measurement (`obs.length`), and a `shoulder` before `start.time` and after `start.time + obs.length`.
+When running the function `click.peak2`, for each measurement, a window will open, in which you must click on the start point and the end point. The observation window is based on the `start.time` given in the `auxfile`, the length of the measurement (`obs.length`), and a `shoulder` before `start.time` and after `start.time + obs.length`.
 
 ### Usage
 
 ```{r}
 #| eval: false
 #| code-copy: false
-click.peak(
-  flux.unique,
+click.peak2(
+  ow.list,
   gastype = "CO2dry_ppm",
   sleep = 3,
   plot.lim = c(380, 1000),
-  warn.length = 60
+  seq = NULL,
+  warn.length = 60,
+  save.plots = NULL
 )
 ```
 
 ### Arguments
 
-+---------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `flux.unique` | data.frame; output from the function [`obs.win`](manualID.qmd#sec-obs.win). Must contain the columns `gastype` (see below), `POSIX.time` and `UniqueID`.                                                                                                                                       |
-+---------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `gastype`     | character string; specifies which gas should be displayed on the plot to manually select start time and end time of measurements. Must be one of the following: "CO2dry_ppm", "COdry_ppb", "CH4dry_ppb", "N2Odry_ppb", "NH3dry_ppb" or "H2O_ppm". Default is "CO2dry_ppm".                     |
-+---------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `sleep`       | numerical value; delay before closing the resulting plot. When used with the function [`click.peak.loop`](manualID.qmd#tip-click.peak.loop), grants a delay between measurements to visually inspect the output before processing the next measurement. Sleep must be shorter than 10 seconds. |
-+---------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `plot.lim`    | numerical vector of length 2; sets the Y axis limits in the plots. Default values are set for a typical gas measurement of "CO2dry_ppm" from soils: `plot.lim = c(380,1000)`.                                                                                                                  |
-+---------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `warn.length` | numerical value; limit under which a measurement is flagged for being too short (`nb.obs < warn.length`). Default value is `warn.length = 60`.                                                                                                                                                 |
-+---------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `ow.list`     | list of data.frame; output from the function [`obs.win`](manualID.qmd#sec-obs.win). Must contain the columns `gastype` (see below), `POSIX.time` and `UniqueID`.                                                                                                           |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `gastype`     | character string; specifies which gas should be displayed on the plot to manually select start time and end time of measurements. Must be one of the following: "CO2dry_ppm", "COdry_ppb", "CH4dry_ppb", "N2Odry_ppb", "NH3dry_ppb" or "H2O_ppm". Default is "CO2dry_ppm". |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `sleep`       | numerical value; delay before closing the resulting plot. Grants a delay between measurements to visually inspect the output before processing the next measurement. Sleep must be shorter than 10 seconds. If `sleep = NULL`, the plots will not close.                   |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `plot.lim`    | numerical vector of length 2; sets the Y axis limits in the plots. Default values are set for a typical gas measurement of "CO2dry_ppm" from soils: `plot.lim = c(380,1000)`.                                                                                              |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `seq`         | a numerical sequence that indicates objects in a list. By default, `seq = NULL` and the function loops through all data frames in `ow.list`.                                                                                                                               |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `warn.length` | numerical value; limit under which a measurement is flagged for being too short (`nb.obs < warn.length`). Default value is `warn.length = 60`.                                                                                                                             |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `save.plots`  | character string; a file name without the extension .pdf to save the plots produced with click.peak2. By default, `save.plot = NULL` and plots are not saved.                                                                                                              |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ### Details
 
@@ -304,13 +310,15 @@ The argument `plot.lim` is used to remove any data points below and above the pl
 
 These values will vary depending on ecosystem type and chamber application scheme.
 
+The argument `seq` is used to select a subset of data frame from the list of data frames in `ow.list`. For example, to apply the function on the first measurement in the list, set `seq = 1`, or `seq = seq(1,10)` for the first 10 measurements.
+
 `warn.length` is the limit below which the chamber closure time is flagged for being too short (`nb.obs < warn.length`). Portable greenhouse gas analyzers typically measure at a frequency of 1 Hz. Therefore, for the default setting of `warn.length = 60`, the chamber closure time should be approximately one minute (60 seconds). If the number of observations is smaller than the threshold, a warning is printed: "Number of observations for UniqueID: 'UniqueID' is X observations".
 
 In `gastype`, the gas species listed are the ones for which this package has been adapted. Please write to the maintainer of this package for adaptation of additional gases.
 
 ### Value
 
-The function returns a data.frame, identical to the input `flux.unique`, with the additional columns `flag`, `Etime`, `start.time_corr`, `end.time_corr` and `obs.length_corr`.
+The function returns a data.frame, identical to an unlisted version of the input `ow.list`, with the additional `flag`, `Etime`, `start.time_corr`, `end.time_corr` and `obs.length_corr`.
 
 ### Example
 
@@ -319,7 +327,7 @@ In this example, the observation time is 3 minutes (180 seconds) and the shoulde
 ```{r}
 #| eval: false
 # Manually identify measurements by clicking on the start and end points
-manID.UGGA <- click.peak(ow.UGGA[[2]])
+manID.UGGA <- click.peak2(ow.UGGA, seq = 1)
 ```
 
 ![](images/click.peak1.png){#fig-click.peak1 fig-align="center"}
@@ -327,25 +335,19 @@ manID.UGGA <- click.peak(ow.UGGA[[2]])
 ![](images/click.peak2.png){#fig-click.peak2 fig-align="center"}
 
 ::: {#tip-click.peak.loop .callout-tip}
-Note that for **more than one gas measurement**, it is better to use the function `click.peak.loop` with `lapply` rather than using `click.peak` for each measurement individually.
+#### Multiple loops with large data sets
 
-```{r}
-#| eval: false
-# Manually identify measurements by clicking on the start and end points
-manID.UGGA <- lapply(seq_along(ow.UGGA), click.peak.loop, flux.unique = ow.UGGA) %>%
-  map_df(., ~as.data.frame(.x))
-```
+Note that the output from the function `obs.win` is a list of data frames. The function `click.peak2` loops through all data frames in the list.
 
-If you need to create **multiple loops**, you can simply enumerate a subset of your `flux.unique`:
+For more than 20 measurements, it is highly recommended to create multiple loops. This helps avoid issues with miss-clicking and repeating the process.
+
+If you need to create **multiple loops**, use the argument `seq` in `click.peak2`:
 
 ```{r}
 #| eval: false
 # Create two loops
-manID.UGGA.1 <- lapply(c(1:20), click.peak.loop, flux.unique = ow.UGGA) %>%
-  map_df(., ~as.data.frame(.x))
-
-manID.UGGA.2 <- lapply(c(21:40), click.peak.loop, flux.unique = ow.UGGA) %>%
-  map_df(., ~as.data.frame(.x))
+manID.UGGA.1 <- click.peak2(ow.UGGA, seq = seq(1,10))
+manID.UGGA.2 <- click.peak2(ow.UGGA, seq = seq(11,20))
 
 # Combine the two objects back into one object
 manID.UGGA <- rbind(manID.UGGA.1, manID.UGGA.2)
@@ -353,7 +355,22 @@ manID.UGGA <- rbind(manID.UGGA.1, manID.UGGA.2)
 :::
 
 ::: callout-tip
-Between each measurement, the result of the `click.peak` function is displayed for 3 seconds. To increase this delay, change the parameter `sleep` in the function `click.peak.loop`.
+#### Sleep between loops
+
+Between each measurement, the result of the function `click.peak2` is displayed for 3 seconds. To increase this delay, change the parameter `sleep` in the function `click.peak2`. To prevent the quality check plots from closing, use `sleep = NULL`.
+:::
+
+::: callout-tip
+#### Save plots
+
+Both plots generated in the function `click.peak2` can be saved as a pdf using the argument `save.plots` with a character string indicating the name of the pdf file (without the extension .pdf):
+
+```{r}
+#| eval: false
+manID.UGGA <- click.peak2(ow.UGGA, save.plots = "click.peak.plots")
+```
+
+![](images/click.peak.pdf.png)
 :::
 
 ::: callout-warning
@@ -370,13 +387,15 @@ Otherwise, if the number of observation satisfies this threshold, then the follo
 #| echo: false
 message("Good window of observation for UniqueID: 733a_C_C")
 ```
+
+This argument can be adjusted depending on the expected number of observations in your experiment.
 :::
 
 ::: callout-tip
 To **re-click on a single measurement** based on UniqueID, see [this example](troubleshoot.qmd) shown on the [Troubleshoot page](troubleshoot.qmd#sec-click.peak).
 :::
 
-## Additional auxiliary parameters {#sec-aux}
+#### Additional auxiliary parameters {#sec-aux}
 
 To convert the flux estimate's units into nmol CO~2~/H~2~O m^-2^s^-1^ or µmol CH~4~/N~2~O m^-2^s^-1^, the temperature inside the chamber (`Tcham`; °C) and the atmospheric pressure inside the chamber (`Pcham`; kPa) are also required. If `Pcham` and `Tcham` are missing, normal atmospheric pressure (101.325 kPa) and an air temperature of 15 °C are used as default.
 
