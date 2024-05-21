@@ -92,9 +92,9 @@ CO2_plots <- flux.plot(CO2_best, manID.UGGA, "CO2dry_ppm", shoulder=20,
                        quality.check = TRUE)
 
 # CH4
-CH4_flux <- goFlux(manID.UGGA, "CH4dry_ppm")
+CH4_flux <- goFlux(manID.UGGA, "CH4dry_ppb")
 CH4_best <- best.flux(CH4_flux, criteria = c("MAE", "AICc", "g.factor", "MDF"))
-CH4_plots <- flux.plot(CH4_best, manID.UGGA, "CH4dry_ppm", shoulder=20,
+CH4_plots <- flux.plot(CH4_best, manID.UGGA, "CH4dry_ppb", shoulder=20,
                        plot.legend = c("MAE", "RMSE", "AICc", "k.ratio", "g.factor"), 
                        plot.display = c("MDF", "prec", "nb.obs", "flux.term"), 
                        quality.check = TRUE)
@@ -152,12 +152,15 @@ flux2pdf(plot.list, outfile = NULL, width = 11.6, height = 8.2)
 
 ### Arguments
 
-|             |                                                                                                                                                                               |
-|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
++-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | `plot.list` | a list of plots; output from the function `flux.plot`.                                                                                                                        |
++-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | `outfile`   | a character string indicating the full name of the pdf output file (including the path). Default is to save the pdf in the working directory, with the name of the plot.list. |
++-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | `width`     | numerical value; width of the pdf page. Default is 11.6 inches.                                                                                                               |
++-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | `height`    | numerical value; height of the pdf page. Default is 8.2 inches.                                                                                                               |
++-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ### Example
 
