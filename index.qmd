@@ -1,5 +1,5 @@
 ---
-title: "goFlux: A user-friendly way to calculate GHG fluxes yourself, regardless of user experience"
+title: "goFlux, For User-Friendly Chamber Data Processing, Flux Estimation, and Diagnostics"
 editor: visual
 format:
   html:
@@ -48,7 +48,7 @@ Click on the tabs on the sidebar to navigate through each step, or follow the li
 
 ## How to cite
 
-Please cite this R package using this publication in JOSS: \
+Please cite this R package using this publication in JOSS:\
 \
 Rheault et al., (2024). goFlux: A user-friendly way to calculate GHG fluxes yourself, regardless of user experience. Journal of Open Source Software, 9(96), 6393, <https://doi.org/10.21105/joss.06393>
 
