@@ -276,7 +276,9 @@ click.peak2(
   plot.lim = c(380, 1000),
   seq = NULL,
   warn.length = 60,
-  save.plots = NULL
+  save.plots = NULL,
+  width = 14,
+  height = 8
 )
 ```
 
@@ -295,7 +297,11 @@ click.peak2(
 +---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | `warn.length` | numerical value; limit under which a measurement is flagged for being too short (`nb.obs < warn.length`). Default value is `warn.length = 60`.                                                                                                                             |
 +---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `save.plots`  | character string; a file name without the extension .pdf to save the plots produced with click.peak2. By default, `save.plot = NULL` and plots are not saved.                                                                                                              |
+| `save.plots`  | character string; a file path with the extension .pdf to save the plots produced with click.peak2. By default, `save.plot = NULL` and plots are not saved.                                                                                                                 |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `width`       | numerical value; width of the pop-up window.                                                                                                                                                                                                                               |
++---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `height`      | numerical value; height of the pop-up window.                                                                                                                                                                                                                              |
 +---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ### Details
@@ -310,17 +316,36 @@ The argument `plot.lim` is used to remove any data points below and above the pl
 
 These values will vary depending on ecosystem type and chamber application scheme.
 
-The argument `seq` is used to select a subset of data frame from the list of data frames in `ow.list`. For example, to apply the function on the first measurement in the list, set `seq = 1`, or `seq = seq(1,10)` for the first 10 measurements.
+The argument `seq` is used to select a subset of data frame from the list of data frames in `ow.list`. For example, to apply the function on the first measurement in the list, set `seq = 1`, or `seq = seq(1,10)` for the first 10 measurements.
 
 `warn.length` is the limit below which the chamber closure time is flagged for being too short (`nb.obs < warn.length`). Portable greenhouse gas analyzers typically measure at a frequency of 1 Hz. Therefore, for the default setting of `warn.length = 60`, the chamber closure time should be approximately one minute (60 seconds). If the number of observations is smaller than the threshold, a warning is printed: "Number of observations for UniqueID: 'UniqueID' is X observations".
 
 In `gastype`, the gas species listed are the ones for which this package has been adapted. Please write to the maintainer of this package for adaptation of additional gases.
 
+The arguments `width` and `heigth` are used with the function `dev.new` to define the dimentions of the pop-up window.
+
 ### Value
 
-The function returns a data.frame, identical to an unlisted version of the input `ow.list`, with the additional `flag`, `Etime`, `start.time_corr`, `end.time_corr` and `obs.length_corr`.
+The function returns a data.frame, identical to an unlisted version of the input `ow.list`, with the additional `flag`, `Etime`, `start.time_corr`, `end.time_corr` and `obs.length_corr`.
 
 ### Example
+
+::: callout-important
+## WARNING! About pop-up graphics device
+
+This function makes use of the function `graphics::identify()` which is only supported on screen devices such as X11, windows and quartz. It is therefore essential to verify that your system options are compatible with this function before running it, to avoid errors. Here is an example of how to modify your system options for graphics device:
+
+```{r}
+default.device <- getOption("device") # save default option
+options(device = "X11") # change system option to device = "X11"
+```
+
+After using the function `click.peak2`, remember to revert back to your default system option.
+
+```{r}
+options(device = default.device) # revert back to default option 
+```
+:::
 
 In this example, the observation time is 3 minutes (180 seconds) and the shoulder is 60 seconds. Therefore, the observation window shows 60 seconds before the `start.time` and 240 seconds after.
 
