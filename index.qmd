@@ -52,6 +52,26 @@ Please cite this R package using this publication in JOSS:\
 \
 Rheault et al., (2024). goFlux: A user-friendly way to calculate GHG fluxes yourself, regardless of user experience. Journal of Open Source Software, 9(96), 6393, <https://doi.org/10.21105/joss.06393>
 
+## JOSSCast
+
+Wanna know more about how goFlux came to be?
+
+Watch my interview on JOSSCast with [Abigail Cabunoc Mayes](https://www.linkedin.com/in/abbycabs/) & [Arfon Smith](https://www.linkedin.com/in/arfon/), from the [Journal of Open Source Software](https://joss.theoj.org/), on [Spotify](https://podcasters.spotify.com/pod/show/josscast/episodes/Greenhouse-Gas-Flux-Analysis-Made-Easy--Karelle-Rheault-on-goFlux-e2munf9), [Youtube](https://www.youtube.com/watch?v=x_n5oLhFSUw) or [Apple Podcasts](https://podcasts.apple.com/ca/podcast/greenhouse-gas-flux-analysis-made-easy-karelle-rheault/id1725931379?i=1000664688023) 👇
+
+[![](images/JOSSCast teaser.mp4)](https://www.youtube.com/watch?v=x_n5oLhFSUw)
+
+Episode highlights:
+
+-   \[02:03\] - Karelle's Journey to Creating goFlux
+-   \[02:56\] - Understanding Greenhouse Gas Fluxes
+-   \[05:19\] - Measurement Techniques and Tools
+-   \[09:30\] - Challenges and Advantages of goFlux
+-   \[20:20\] - Open Source Contributions and Community Support
+-   \[23:57\] - Karelle's Experience with JOSS
+-   \[27:00\] - Future Plans and Contributions
+-   \[28:59\] - Organizing the Community and Setting Standards
+-   \[31:27\] - Conclusion and Farewell
+
 ## Acknowledgements
 
 This software development was supported by the SilvaNova project funded by the NOVO Nordisk Foundation (grant no. NNF20OC0059948).
