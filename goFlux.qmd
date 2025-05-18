@@ -20,9 +20,35 @@ Where $LM.flux$ and $MDF$ have the same units (nmol or µmol·m^-2^·s^-1^) and 
 
 All flux estimates, including the MDF, are multiplied by a $flux.term$ which is used to correct for water vapor inside the chamber, as well as convert the units to obtain a term in nmol or µmol·m^-2^·s^-1^:
 
-$$\mathbf{Eqn~3}~~~~~~flux.term = \frac{(1 - H_2O)~V~P}{A~R~T}$$
+$$\mathbf{Eqn~3}~~~~~~flux.term = \frac{(1 - H_2O)~V~P}{A~R~T}$$ {#eq-flux.term}
 
 Where $H_2O$ is the water vapor in mol·mol^-1^, $V$ is the volume inside the chamber (+instrument and tubing) in liters, $P$ is the pressure in kPa, $A$ is the surface area inside the chamber in m^2^, $R$ is the universal gas constant in L·kPa·K^-1^·mol^-1^, and $T$ is the temperature inside the chamber in Kelvin. Each parameter is measured inside the chamber at $t = 0$.
+
+### Water vapor correction
+
+The "flux term" is a conversion factor used to convert the flux units. Furthermore, the `flux.term` contains a correction term to account for water vapor inside the chamber: $(1 - H_2O)$. This correction term is often overlooked, but is essential when estimating fluxes using dry mole fractions of gases, as described below.
+
+During a measurement in a closed chamber system, if water vapor increases due to evapo-transpiration from soils and plants, it displaces some of the chamber air, thereby diluting all other gases. As a result, flux measurements are underestimated [@welles2001]. That is why most manufacturers provide the dry fraction of measured gases (e.g., `CO2dry_ppm`), meaning that gas concentrations relate the dry mole fraction to the mole fraction measured in moist air by accounting for the dilution effect of water vapor. If manufacturers do not provide the dry fraction of gases, the import functions of the *goFlux* R package converts gas concentrations to their dry fractions automatically.
+
+For example, to obtain the CO~2~ flux $F_c$ in µmol·m^-2^·s^-1^, one must multiply the rate of change of the CO~2~ mole fraction $dC/dt$ with other environmental parameters, immediately after chamber closure, as follows:
+
+$$
+\mathbf{Eqn~4}~~~~~~F_c = \frac{V}{A}\cdot\frac{P_0}{R~T_0}\cdot\frac{dC}{dt}
+$$ {#eq-4}
+
+Where $V$ is the volume inside the chamber (+instrument and tubing) in liters, $P_0$ is the initial air pressure in kPa, $A$ is the surface area inside the chamber in m^2^, $R$ is the universal gas constant in L·kPa·K^-1^·mol^-1^, $T_0$ is the initial temperature inside the chamber in Kelvin. However, this equation does not account for the water vapor dilution in the chamber. To correct for water vapor dilution, one must replace $C$, the CO~2~ mole fraction, with the dry mole fraction $C'$:
+
+$$
+\mathbf{Eqn~5}~~~~~~C = C'(1~-~W)
+$$ {#eq-5}
+
+Where $W$ is the water vapor in mol·mol^-1^. Therefore, when we use the dry fractions of gases for calculating the rate change in gas concentration, we must also correct for water vapor dilution at the start of the measurement in the equation:
+
+$$
+\mathbf{Eqn~6}~~~~~~F_c = \frac{V}{A}\cdot\frac{P_0(1-W_0)}{R~T_0}\cdot\frac{dC'}{dt}
+$$ {#eq-6}
+
+For a more detailed demonstration of how these equations were obtained, refer to the LI-COR support documentations of the LI-8100A instrument ([Support \> LI-8100A \> Operating Instructions \> Deriving the Flux Equation: The Model](https://www.licor.com/support/LI-8100A/topics/deriving-the-flux-equation.html#fc)).
 
 ## **Usage**
 
@@ -52,21 +78,21 @@ goFlux(
 
 ### Arguments
 
-|               |                                                                                                                                                                                                                                                                                                                                         |
-|------------|------------------------------------------------------------|
-| `dataframe`   | a data.frame containing gas measurements (see `gastype` below), water vapor measurements (see `H2O_col` below) and the following columns: `UniqueID`, `Etime`, `Vtot`, `Area`, `Pcham`, `Tcham` and `flag` (see the parameters `Vtot`, `Area`, `Pcham` and `Tcham` below for more details). `chamID` may be used instead of `UniqueID`. |
-| `gastype`     | character string; specifies which column should be used for the flux calculations. Must be one of the following: "CO2dry_ppm", "CH4dry_ppb", "COdry_ppb", "N2Odry_ppb", "NH3dry_ppb" or "H2O_ppm".                                                                                                                                      |
-| `H2O_col`     | character string; specifies which column should be used to subtract the effect of water vapor in the chamber space. Default is `H2O_col = "H2O_ppm"`.                                                                                                                                                                                   |
-| `prec`        | numerical value; precision of the instruments. Units must be the same as `gastype`. With the default `prec = NULL`, instrument precision for each gas must be provided in `dataframe`.                                                                                                                                                  |
-| `Area`        | numerical value; area of the soil surface inside the chamber (cm^2^). Alternatively, provide the column `Area` in `dataframe` if `Area` is different between samples.                                                                                                                                                                   |
-| `offset`      | (optional) numerical value; height between the soil surface and the chamber (cm). Alternatively, provide the column `offset` in `dataframe` if `offset` is different between samples. `offset` is only used if `Vtot` is missing.                                                                                                       |
-| `Vtot`        | numerical value; total volume inside the chamber, tubes, instruments, etc. (L). Alternatively, provide the column `Vtot` in `dataframe` if `Vtot` is different between samples. If `Vtot` is missing, the function will calculate it from `Area`, `Vcham` and `offset`.                                                                 |
-| `Vcham`       | (optional) numerical value; volume inside the chamber, tubes and instruments (L). Alternatively, provide the column `Vcham` in `dataframe` if `Vcham` is different between samples. `Vhcam` is only used if `Vtot` is missing.                                                                                                          |
-| `Pcham`       | numerical value; pressure inside the chamber (kPa). Alternatively, provide the column `Pcham` in `dataframe` if `Pcham` is different between samples. If `Pcham` is not provided, normal atmospheric pressure (101.325 kPa) is used.                                                                                                    |
-| `Tcham`       | numerical value; temperature inside the chamber (Celsius). Alternatively, provide the column `Tcham` in `dataframe` if `Tcham` is different between samples. If `Tcham` is not provided, 15°C is used as default.                                                                                                                       |
-| `k.mult`      | numerical value; a multiplier for the allowed kappa-max. Default setting is no multiplier (`k.mult = 1`). `k.mult` cannot be negative and must be smaller or equal to 10.                                                                                                                                                               |
-| `warn.length` | numerical value; limit under which a measurement is flagged for being too short (`nb.obs < warn.length`).                                                                                                                                                                                                                               |
-| `k.min`       | numerical value; a lower boundary value for kappa in the HM model. Default is `k.min = 10^-8`                                                                                                                                                                                                                                           |
+|  |  |
+|----------------|--------------------------------------------------------|
+| `dataframe` | a data.frame containing gas measurements (see `gastype` below), water vapor measurements (see `H2O_col` below) and the following columns: `UniqueID`, `Etime`, `Vtot`, `Area`, `Pcham`, `Tcham` and `flag` (see the parameters `Vtot`, `Area`, `Pcham` and `Tcham` below for more details). `chamID` may be used instead of `UniqueID`. |
+| `gastype` | character string; specifies which column should be used for the flux calculations. Must be one of the following: "CO2dry_ppm", "CH4dry_ppb", "COdry_ppb", "N2Odry_ppb", "NH3dry_ppb" or "H2O_ppm". |
+| `H2O_col` | character string; specifies which column should be used to subtract the effect of water vapor in the chamber space. Default is `H2O_col = "H2O_ppm"`. |
+| `prec` | numerical value; precision of the instruments. Units must be the same as `gastype`. With the default `prec = NULL`, instrument precision for each gas must be provided in `dataframe`. |
+| `Area` | numerical value; area of the soil surface inside the chamber (cm^2^). Alternatively, provide the column `Area` in `dataframe` if `Area` is different between samples. |
+| `offset` | (optional) numerical value; height between the soil surface and the chamber (cm). Alternatively, provide the column `offset` in `dataframe` if `offset` is different between samples. `offset` is only used if `Vtot` is missing. |
+| `Vtot` | numerical value; total volume inside the chamber, tubes, instruments, etc. (L). Alternatively, provide the column `Vtot` in `dataframe` if `Vtot` is different between samples. If `Vtot` is missing, the function will calculate it from `Area`, `Vcham` and `offset`. |
+| `Vcham` | (optional) numerical value; volume inside the chamber, tubes and instruments (L). Alternatively, provide the column `Vcham` in `dataframe` if `Vcham` is different between samples. `Vhcam` is only used if `Vtot` is missing. |
+| `Pcham` | numerical value; pressure inside the chamber (kPa). Alternatively, provide the column `Pcham` in `dataframe` if `Pcham` is different between samples. If `Pcham` is not provided, normal atmospheric pressure (101.325 kPa) is used. |
+| `Tcham` | numerical value; temperature inside the chamber (Celsius). Alternatively, provide the column `Tcham` in `dataframe` if `Tcham` is different between samples. If `Tcham` is not provided, 15°C is used as default. |
+| `k.mult` | numerical value; a multiplier for the allowed kappa-max. Default setting is no multiplier (`k.mult = 1`). `k.mult` cannot be negative and must be smaller or equal to 10. |
+| `warn.length` | numerical value; limit under which a measurement is flagged for being too short (`nb.obs < warn.length`). |
+| `k.min` | numerical value; a lower boundary value for kappa in the HM model. Default is `k.min = 10^-8` |
 
 ### Details
 
