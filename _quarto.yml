@@ -40,7 +40,7 @@ website:
       - file: import.qmd
         text: "Import"
       - file: manualID.qmd
-        text: "Manual ID"
+        text: "Measurement ID"
       - file: goFlux.qmd
         text: "goFlux"
       - file: bestflux.qmd
