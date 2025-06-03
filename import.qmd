@@ -53,6 +53,7 @@ import2RData(
   timezone = "UTC",
   keep_all,
   prec,
+  merge,
   ...
 )
 ```
@@ -60,13 +61,14 @@ import2RData(
 ## Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `path` | character string; a folder path containing all files to be imported. Ideally, to avoid any errors, the folder should only contain the files to be imported. |
 | `instrument` | character string; specifies which instrument was used to generate the files contained in the folder path. Choose one of the following: "DX4015", "EGM5", "G2201i", "G2508", "G4301", "GAIA", "GasmetPD", "GT5000", "LI-6400", "LI-7810", "LI-7820", "LI-8100", "LI-8200", "LI-8250", "N2OM1", "uCH4", "uN2O", "UGGA". For more information about an instrument, see the section "See Also" below. |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
 | `keep_all` | logical; if `keep_all = TRUE`, keep all columns from the raw file. The default is `keep_all = FALSE`, and columns that are not necessary for gas flux calculation are removed. |
 | `prec` | numerical vector; the precision of the instrument for each gas. Look at the examples below, or the help for each import function of each instrument, to know what values to use. |
+| `merge` | logical; if TRUE, merge all files as one data frame and return it in the Console, or load it in the Environment if assigned to an object. |
 | `proc.data.field` | numeric value; select the process data field used with the EGM-5. See [`import.EGM5`](#sec-pp-sys-single) for more details. |
 | `pivot` | character string; either "long" or "wide". If `pivot = "long"`, each column containing information about `Tsoil`, `Tcham`, `SWC`, `PAR` and operating status (`Op.stat`) will be saved in a single column per parameter. If `pivot = "wide"`, the default display of one column per chamber per parameter will be used. Used with `instrument = "GAIA"` only. |
 | `active` | logical; if `active = TRUE`, preserve data for active chambers only. Used with `instrument = "GAIA"` only. |
@@ -151,6 +153,8 @@ Then use the function `map_df` to get and load all files and combine them into o
 all.imp <- list.files(path = "RData", pattern = "imp.RData", full.names = TRUE) %>%
   map_df(~ get(load(.x)))
 ```
+
+Alternatively, use the argument `merge = TRUE` in the function `import2Rdata` to merge all saved files and assign them to an object directly.
 
 Note that data frames can only be merged if they contain the same columns.
 :::
@@ -441,7 +445,7 @@ import.DX4015(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .TXT |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -501,7 +505,7 @@ import.GT5000(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .TXT |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -564,7 +568,7 @@ import.EGM5(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .TXT |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "dmy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -636,7 +640,7 @@ import.G2201i(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .dat |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -718,7 +722,7 @@ import.G2508(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .dat |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -779,7 +783,7 @@ import.G4301(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .dat |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -866,7 +870,7 @@ import.GAIA(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .csv |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -949,7 +953,7 @@ import.GasmetPD(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1010,7 +1014,7 @@ import.UGGA(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "dmy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1086,7 +1090,7 @@ import.N2OM1(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "dmy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1147,7 +1151,7 @@ import.LI6400(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "mdy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1209,7 +1213,7 @@ import.LI7810(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .data |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1269,7 +1273,7 @@ import.LI7820(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .data |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1329,7 +1333,7 @@ import.LI8100(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .81x |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1381,7 +1385,7 @@ import.LI8200(inputfile, date.format = "ymd", timezone = "UTC", save = FALSE)
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .json |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1452,7 +1456,7 @@ import.LI8250(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .82z |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1528,7 +1532,7 @@ import.uCH4(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "mdy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1588,7 +1592,7 @@ import.uN2O(
 #### Arguments
 
 |  |  |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "mdy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
