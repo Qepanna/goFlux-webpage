@@ -1,0 +1,45 @@
+---
+title: "Other functions in the package goFlux"
+format: 
+  html: 
+    css: styles.css
+engine: knitr
+editor: visual
+---
+
+Aside from the typical workflow of flux calculation, one may wish to estimate other parameters from gas measurements. Currently, this page only contains one additional function. To request more complementary functions, [open an issue on GitHub](https://github.com/Qepanna/goFlux/issues) or contact the maintainer of this package, Karelle Rheault ([karh\@ign.ku.dk](mailto:karh@ign.ku.dk){.email}), directly.
+
+### `iso.comp` for isotopic composition determination
+
+Extracts the y-intercept of the regression between the isotope ratios plotted againts the inverse of the CO~2~ concentration.
+
+#### Usage
+
+::: callout-note
+Code chunks under **Usage** sections are not part of the demonstration. They are meant to show you how to use the arguments in the function.
+:::
+
+```{r}
+#| eval: false
+#| code-copy: false
+iso.comp(
+  dataframe, 
+  CO2_12 = "CO2dry_ppm", 
+  delta_13C = "Delta_Raw_iCO2"
+)
+```
+
+#### Arguments
+
+|  |  |
+|------------|------------------------------------------------------------|
+| `dataframe` | a data.frame containing measurements of isotopic fractions of CO~2~ and a `UniqueID` (or `chamID`) per measurements. |
+| `CO2_12`, `delta_13C` | character string; specifies which columns should be used for CO~2~ measurements, and the delta 13C, respectively. |
+
+#### Example
+
+```{r}
+#| eval: false
+data(manID.G2201i)
+my.iso.comp <- iso.comp(manID.G2201i)
+```
