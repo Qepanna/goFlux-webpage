@@ -8,7 +8,7 @@ The package contains a wide range of functions that let the user import raw data
 -   [**LI-COR trace gas analyzers**](https://www.licor.com/env/products/trace-gas/): LI-6400 for CO~2~ and H~2~O, LI-7810 for CO~2~, CH~4~ and H~2~O, LI-7820 for N~2~O and H~2~O, and LI-8100 for CO~2~ and H~2~O
 -   [**LI-COR Smart Chamber**](https://www.licor.com/env/products/soil-flux/survey): for an easy import of data from any gas analyzer
 -   [**LI-COR**](https://www.licor.com/env/products/soil-flux/survey)[**Multiplexer**](https://www.licor.com/env/products/soil-flux/LI-8250): for an easy import of data from any gas analyzer, and multiple chambers
--   [**Los Gatos Research (ABB) laser gas analyzers**](https://new.abb.com/products/measurement-products/analytical/laser-gas-analyzers/laser-analyzers/lgr-icos-portable-analyzers): Ultra-portable Greenhouse Gas Analyzer (UGGA; GLA132 series), Microportable Greenhouse Gas Analyzer (MGGA; GLA131 series) for CO~2~, CH~4~ and H~2~O, and GLA151-N2OM1 for N~2~O, CH~4~ and H~2~O
+-   [**Los Gatos Research (ABB) laser gas analyzers**](https://new.abb.com/products/measurement-products/analytical/laser-gas-analyzers/laser-analyzers/lgr-icos-portable-analyzers): Ultra-portable Greenhouse Gas Analyzer (UGGA; GLA132 series), Microportable Greenhouse Gas Analyzer (MGGA; GLA131 series) for CO~2~, CH~4~ and H~2~O, GLA151-N2OM1 for N~2~O, CH~4~ and H~2~O, and N~2~O isotopic analyzer (GLA451-N2Oi2)
 -   [**Picarro G2201*-i* Isotopic Analyzer**](https://www.picarro.com/environmental/products/g2201i_isotopic_analyzer): for δ^13^C for CH~4~ and CO~2~
 -   [**Picarro G2508 Gas Concentration Analyzer**](https://www.picarro.com/g2508_gas_concentration_analyzer): for CO~2~, CH~4~, N~2~O, NH~3~ and H~2~O
 -   [**Picarro GasScouter^TM^ G4301 Mobile Gas Concentration Analyzer**](https://www.picarro.com/products/gas-scouter-g4301): for CO~2~, CH~4~ and H~2~O
@@ -29,7 +29,7 @@ There are two ways to import raw data files into R:
 Import all raw gas measurement files contained in a folder (and all its sub-folders) using the function `import2RData`. Adapted to multiple greenhouse gas analyzers and other instruments:
 
 -   [**LI-COR**](import.qmd#sec-LICOR-loop): LI-6400, LI-7810, LI-7820, LI-8100, LI-8200 (smart chamber), LI-8250 (Multiplexer)
--   [**Los Gatos Research (LGR)**](import.qmd#sec-LGR-loop): ultra-portable GGA (GLA132 series), micro ultra-portable GGA (GLA131 series) and N2OM1 (GLA151 series)
+-   [**Los Gatos Research (LGR)**](import.qmd#sec-LGR-loop): ultra-portable GGA (GLA132 series), micro ultra-portable GGA (GLA131 series), N2OM1 (GLA151 series) and N2Oi2 (GLA451 series)
 -   [**GAIA2TECH (DMR)**](import.qmd#sec-GAIA-loop) automated chamber ECOFlux
 -   [**Picarro**](import.qmd#sec-picarro-loop): G2201-*i*, G2508 and G4301
 -   [**Gasmet**](import.qmd#sec-gasmet-loop): DX4015 and GT5000
@@ -61,9 +61,9 @@ import2RData(
 ## Arguments
 
 |  |  |
-|----------------------|--------------------------------------------------|
+|----------------------|-------------------------------------------------|
 | `path` | character string; a folder path containing all files to be imported. Ideally, to avoid any errors, the folder should only contain the files to be imported. |
-| `instrument` | character string; specifies which instrument was used to generate the files contained in the folder path. Choose one of the following: "DX4015", "EGM5", "G2201i", "G2508", "G4301", "GAIA", "GasmetPD", "GT5000", "LI-6400", "LI-7810", "LI-7820", "LI-8100", "LI-8200", "LI-8250", "N2OM1", "uCH4", "uN2O", "UGGA". For more information about an instrument, see the section "See Also" below. |
+| `instrument` | character string; specifies which instrument was used to generate the files contained in the folder path. Choose one of the following: "DX4015", "EGM5", "G2201i", "G2508", "G4301", "GAIA", "GasmetPD", "GT5000", "LI-6400", "LI-7810", "LI-7820", "LI-8100", "LI-8200", "LI-8250", "N2OM1", "N2Oi2", "uCH4", "uN2O", "UGGA". For more information about an instrument, see the section "See Also" below. |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
 | `keep_all` | logical; if `keep_all = TRUE`, keep all columns from the raw file. The default is `keep_all = FALSE`, and columns that are not necessary for gas flux calculation are removed. |
@@ -86,6 +86,7 @@ import2RData(
 | `CO2` | character string; which column should be used for CO~2~ concentration. By default, `CO2 = "12CO2_dry"`. Used with `instrument = "G2201i"` only. |
 | `sum` | logical; if `sum = TRUE` (default), the arguments `CH4` and `CO2` are ignored and, instead, both fractions (carbon isotope 12 and 13) of each gas, are summed after correction for water vapor, to obtain the total gas concentration. See the argument `range` for the selection between the HP or the HR measurement of CH~4~ concentration. Used with `instrument = "G2201i"` only. |
 | `range` | numerical value; at which threshold should the function select between high precision (HP) and high resolution (HR) of CH~4~ concentration? The default is `range = 10`. If the methane concentration recorded in the column `HP_12CH4_dry` is above 10 ppm, the concentration from the columns `HR_12CH4_dry` and `HR_13CH4` are used for the sum instead of HP. Used with `instrument = "G2201i"` only. |
+| `gas` | character vector; a pattern to match the columns containing each gas measurement. Choose from: "CO2_ppm", "CH4_ppm", "N2O_ppm", "NH3_ppm", "NO2_ppm", "NO_ppm" and "H2O_ppm". Used with `instrument = "GasmetPD"` only. |
 
 ## Details
 
@@ -105,6 +106,7 @@ In `date.format`, the date format refers to a date found in the raw data file, n
 -   LI-8100: column Date
 -   LI-8200: (see comment below)
 -   N2OM1: column Time
+-   N2Oi2: column Time
 -   uCH4: column Time Stamp
 -   uN2O: column Time Stamp
 -   UGGA: column Time
@@ -116,6 +118,8 @@ The argument `proc.data.field` is used with the PP-Sytems EGM-5 instrument only.
 The arguments `active`, `pivot`, `flag`, `background`, `CH.col`, `PAR.col`, `Tcham.col`, `WTD.col`, `Op.stat.col`, `inst3`, `gas3`, `prec3`, `dry3`, `sep` and `skip` are used with the function [`import.GAIA`](#sec-GAIA-single) only. The arguments `Tsoil.col`, `SWC.col`, `inst1`, `inst2`, `gas1`, `gas2`, `prec1`, `prec2`, `dry1`, `dry2`, are used with both the function [`import.GAIA`](#sec-GAIA-single) and the function [`import.LI8250`](#sec-LI8250-single).
 
 The arguments `CH4`, `CO2`, `sum` and `range` are used with the function [`import.G2201i`](#sec-G2201i-single) only.
+
+The argument `gas` is used with the function [`import.GasmetPD`](#sec-GasmetPD-single) only.
 
 ## Examples
 
@@ -275,6 +279,7 @@ import2RData(path = file.path, instrument = "GAIA", date.format = "ymd",
 # using the function system.file
 file.path <- system.file("extdata/GasmetPD", package = "goFlux")
 import2RData(path = file.path, instrument = "GasmetPD",
+             gas = c("CO2_ppm", "CH4_ppm", "N2O_ppm", "NH3_ppm", "H2O_pct"),
              date.format = "ymd", prec = c(1.6, 13, 2, 23, 33))
 ```
 
@@ -311,6 +316,17 @@ import2RData(path = file.path, instrument = "UGGA",
 file.path <- system.file("extdata/N2OM1", package = "goFlux")
 import2RData(path = file.path, instrument = "N2OM1",
              date.format = "dmy", prec = c(0.5, 2, 50))
+```
+
+#### N2Oi2 (GLA451 series)
+
+```{r}
+#| eval: false
+# Retrieve file path from example file in the goFlux package
+# using the function system.file
+file.path <- system.file("extdata/N2Oi2", package = "goFlux")
+import2RData(path = file.path, instrument = "N2Oi2",
+             date.format = "dmy", prec = c(0.05, 50))
 ```
 
 ### LI-COR {#sec-LICOR-loop}
@@ -445,7 +461,7 @@ import.DX4015(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .TXT |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -505,7 +521,7 @@ import.GT5000(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .TXT |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -568,7 +584,7 @@ import.EGM5(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .TXT |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "dmy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -640,7 +656,7 @@ import.G2201i(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .dat |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -722,7 +738,7 @@ import.G2508(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .dat |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -783,7 +799,7 @@ import.G4301(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .dat |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -870,7 +886,7 @@ import.GAIA(
 #### Arguments
 
 |  |  |
-|----------------------|--------------------------------------------------|
+|----------------------|-------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .csv |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -933,7 +949,7 @@ import.GAIA(inputfile = file.path, save = TRUE)
 
 ### Custom made multiplexer linked with the Gasmet DX4015
 
-Imports single raw gas measurement files from the GasmetPD, a custom made multiplexer linked with the Gasmet DX4015 (CO~2~, CH~4~, N~2~O, NH~3~ and H~2~O)
+Imports single raw gas measurement files from the GasmetPD, a custom made multiplexer linked with the Gasmet DX4015 (CO~2~, CH~4~, N~2~O, NO~2~, NO, NH~3~ and H~2~O)
 
 #### Usage
 
@@ -946,6 +962,7 @@ import.GasmetPD(
   timezone = "UTC",
   save = FALSE,
   keep_all = FALSE,
+  gas = c("CO2_ppm", "CH4_ppm", "N2O_ppm", "NH3_ppm", "H2O_pct"),
   prec = c(1.6, 13, 2, 23, 33)
 )
 ```
@@ -953,13 +970,14 @@ import.GasmetPD(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------|--------------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
 | `save` | logical; if `save = TRUE`, saves the file as an .RData file in a RData folder in the current working directory. If `save = FALSE`, returns the file in the Console, or load in the Environment if assigned to an object. |
 | `keep_all` | logical; if `keep_all = TRUE`, keep all columns from the raw file. The default is `keep_all = FALSE`, and columns that are not necessary for gas flux calculation are removed. |
-| `prec` | numerical vector; the precision of the instrument for each gas, in the following order: "CO2dry_ppm", "CH4dry_ppb", "N2Odry_ppb", "NH3dry_ppb" and "H2O_ppm". The default is `prec = c(1.6, 13, 2, 23, 33)`. |
+| `gas` | character vector; a pattern to match the columns containing each gas measurement. Choose from: "CO2dry_ppm", "CH4dry_ppb", "N2Odry_ppb", "NH3dry_ppb", "NO2_ppm", "NO_ppm" and "H2O_ppm". |
+| `prec` | numerical vector; the precision of the instrument for each gas. Note that the order in the arguments `prec` must match the order of the arguments in `gas`. |
 
 #### Details
 
@@ -1014,7 +1032,7 @@ import.UGGA(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "dmy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1090,7 +1108,7 @@ import.N2OM1(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "dmy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1127,7 +1145,66 @@ imp.N2OM1 <- import.N2OM1(inputfile = file.path, prec = c(0.5, 2, 50))
 import.N2OM1(inputfile = file.path, prec = c(0.5, 2, 50), save = TRUE)
 ```
 
-## LI-COR {#sec-LICOR-single}
+### N2Oi2
+
+Import single raw gas measurement files from the Isotopic N~2~O analyzer (GLA451 series) from Los Gatos Research (N~2~O and site-specific isotopic ratios of N and O) with the function `import.N2Oi2`.
+
+#### Usage
+
+```{r}
+#| eval: false
+#| code-copy: false
+import.N2Oi2(
+  inputfile,
+  date.format = "dmy",
+  timezone = "UTC",
+  save = FALSE,
+  keep_all = FALSE,
+  prec = c(0.05, 50)
+)
+```
+
+#### Arguments
+
+|  |  |
+|----------------------|--------------------------------------------------|
+| `inputfile` | character string; the name of a file with the extension .txt |
+| `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "dmy", as it is the date format from the example data file provided. |
+| `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
+| `save` | logical; if `save = TRUE`, saves the file as an .RData file in a RData folder in the current working directory. If `save = FALSE`, returns the file in the Console, or load in the Environment if assigned to an object. |
+| `keep_all` | logical; if `keep_all = TRUE`, keep all columns from the raw file. The default is `keep_all = FALSE`, and columns that are not necessary for gas flux calculation are removed. |
+| `prec` | numerical vector; the precision of the instrument for each gas, in the following order: "N2Odry_ppb", and "H2O_ppm". The default is `prec = c(0.05, 50)`. |
+
+#### Details
+
+In `date.format`, the date format refers to a date found in the raw data file, not the date format in the file name. For the instrument N2OM1, the date is found in the column "Time".
+
+Note that this function was designed for the following units in the raw file:
+
+-   ppm for N~2~O and H~2~O
+-   Torr for pressure
+-   Celsius for temperature
+
+If your LGR N2Oi2 instrument uses different units, either convert the units after import, change the settings on your instrument, or contact the maintainer of this package for support.
+
+The precision of the instrument is needed to restrict kappa-max ([`k.max`](goFlux.qmd#eq-k.max)) in the non-linear flux calculation ([`HM.flux`](goFlux.qmd#eq-HM)). Kappa-max is inversely proportional to instrument precision. If the precision of your instrument is unknown, it is better to use a low value (e.g. 1 ppm for H~2~O, or 1 ppb for N~2~O) to allow for more curvature, especially for water vapor fluxes, or very long measurements, that are normally curved. The default values given for instrument precision are the ones found [online](https://new.abb.com/products/measurement-products/analytical/laser-gas-analyzers/laser-analyzers/oa-icos-enhanced-performance-benchtop-analyzers/lgr-icos-ultrahigh-performance-qc-benchtop-analyzers-gla451-series) for the latest model of this instrument available at the time of the creation of this function (06-2025).
+
+#### Example
+
+```{r}
+#| eval: false
+# Retrieve file path from example file in the goFlux package
+# using the function system.file
+file.path <- system.file("extdata", "N2Oi2/N2Oi2.txt", package = "goFlux")
+
+# Import in the environment
+imp.N2Oi2 <- import.N2Oi2(inputfile = file.path, prec = c(0.05, 50))
+
+# Or save in a RData folder in the working directory
+import.N2Oi2(inputfile = file.path, prec = c(0.05, 50), save = TRUE)
+```
+
+## LI-COR
 
 ### LI-6400
 
@@ -1151,7 +1228,7 @@ import.LI6400(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "mdy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1213,7 +1290,7 @@ import.LI7810(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .data |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1273,7 +1350,7 @@ import.LI7820(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .data |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1333,7 +1410,7 @@ import.LI8100(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .81x |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1385,7 +1462,7 @@ import.LI8200(inputfile, date.format = "ymd", timezone = "UTC", save = FALSE)
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .json |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1456,7 +1533,7 @@ import.LI8250(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .82z |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "ymd", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1532,7 +1609,7 @@ import.uCH4(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "mdy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
@@ -1592,7 +1669,7 @@ import.uN2O(
 #### Arguments
 
 |  |  |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `inputfile` | character string; the name of a file with the extension .txt |
 | `date.format` | character string; specifies the date format found in the raw data file. Choose one of the following: "dmy", "ymd", or "mdy". Default is "mdy", as it is the date format from the example data file provided. |
 | `timezone` | character string; a time zone in which to import the data to POSIXct format. Default is "UTC". Note about time zone: it is recommended to use the time zone "UTC" to avoid any issue related to summer time and winter time changes. |
