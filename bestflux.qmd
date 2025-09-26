@@ -46,7 +46,7 @@ In the case where the linear flux estimate is larger than the HM flux estimate, 
 For measurements where a large curvature is expected, the g.factor is most likely not a good criteria. Indeed, measurements with a large curvature (e.g. water vapor fluxes) will always have a much larger HM flux estimate than the LM flux estimate.
 :::
 
-### Minimal Detectable Flux (MDF)
+### Minimal Detectable Flux (MDF) {#minimal-detectable-flux}
 
 The minimal detectable flux ($MDF$) is based on instrument precision ($prec$) and measurement time ($t$) [@christiansen2015].
 
@@ -154,7 +154,7 @@ best.flux(
 ### Arguments
 
 |  |  |
-|------------|------------------------------------------------------------|
+|------------------------------------|------------------------------------|
 | `flux.result` | data.frame; output from the function `goFlux`. |
 | `criteria` | character vector; criteria used to assess the goodness of fit of the linear and non-linear flux estimates. Must be at least one the following: "MAE", "RMSE", "AICc", "SE", "g.factor", "kappa", "MDF", "nb.obs", "p-value", or "intercept". The default is all of them. |
 | `intercept.lim` | numerical vector of length 2; inferior and superior limits of the intercept (initial concentration; C~0~). Must be the same units as `gastype` in the `goFlux` function. If `intercept.lim = NULL`, the limits are calculated from the true values of C~0~ and C~t~ for each measurement. |

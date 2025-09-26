@@ -12,11 +12,11 @@ $$\mathbf{Eqn~1}~~~~~~C_t = \varphi~+~(C_0 - \varphi)e^{-~\kappa~t}$$ {#eq-HM}
 
 Where $\varphi$ is the assumed concentration of constant gas source below the surface (also known as $C_i$), $C_0$ is the concentration in the chamber at the moment of chamber closure and $\kappa$ (kappa) determines the curvature of the model. A large kappa returns a strong curvature.
 
-A maximum threshold for this parameter, kappa-max ($k.max$), can be calculated from the linear flux estimate ($LM.flux$), the minimal detectable flux ($MDF$) and the time of chamber closure ($t$) [@hüppi2018].
+A maximum threshold for this parameter, kappa-max ($k.max$), can be calculated from the linear flux estimate ($LM.flux$), the minimal detectable flux ($MDF$) and the time of chamber closure ($t$) [@hüppi2018; @christiansen2015].
 
 $$\mathbf{Eqn~2}~~~~~~k.max = \frac{LM.flux}{MDF~\times~t}$$ {#eq-k.max}
 
-Where $LM.flux$ and $MDF$ have the same units (nmol or µmol·m^-2^·s^-1^) and $t$ is in seconds. Therefore, the units of kappa-max is s^-1^. This limit of kappa-max is included in the `goFlux` function, so that the non-linear flux estimate cannot exceed this maximum curvature. See below for more details about the minimal detectable flux (MDF).
+Where $LM.flux$ and $MDF$ have the same units (nmol or µmol·m^-2^·s^-1^) and $t$ is in seconds. Therefore, the units of kappa-max is s^-1^. This limit of kappa-max is included in the `goFlux` function, so that the non-linear flux estimate cannot exceed this maximum curvature. See [here](bestflux.qmd#minimal-detectable-flux) for more details about the minimal detectable flux (MDF).
 
 All flux estimates, including the MDF, are multiplied by a $flux.term$ which is used to correct for water vapor inside the chamber, as well as convert the units to obtain a term in nmol or µmol·m^-2^·s^-1^:
 
@@ -79,7 +79,7 @@ goFlux(
 ### Arguments
 
 |  |  |
-|------------------------|--------------------------------------------------------------------------------------|
+|------------------|------------------------------------------------------|
 | `dataframe` | a data.frame containing gas measurements (see `gastype` below), water vapor measurements (see `H2O_col` below) and the following columns: `UniqueID`, `Etime`, `Vtot`, `Area`, `Pcham`, `Tcham` and `flag` (see the parameters `Vtot`, `Area`, `Pcham` and `Tcham` below for more details). `chamID` may be used instead of `UniqueID`. |
 | `gastype` | character string; specifies which column should be used for the flux calculations. Must be one of the following: "CO2dry_ppm", "CH4dry_ppb", "COdry_ppb", "N2Odry_ppb", "NH3dry_ppb", "NO_ppb", "NO2_ppb" or "H2O_ppm". |
 | `H2O_col` | character string; specifies which column should be used to subtract the effect of water vapor in the chamber space. Default is `H2O_col = "H2O_ppm"`. |
