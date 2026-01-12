@@ -1,6 +1,9 @@
 ---
 title: "Flux calculation"
-format: html
+format: 
+  html: 
+    css: styles.css
+engine: knitr
 bibliography: references.bib
 csl: apa-no-initials.csl
 editor: visual
@@ -23,6 +26,14 @@ All flux estimates, including the MDF, are multiplied by a $flux.term$ which is 
 $$\mathbf{Eqn~3}~~~~~~flux.term = \frac{(1 - H_2O)~V~P}{A~R~T}$$ {#eq-flux.term}
 
 Where $H_2O$ is the water vapor in mol·mol^-1^, $V$ is the volume inside the chamber (+instrument and tubing) in liters, $P$ is the pressure in kPa, $A$ is the surface area inside the chamber in m^2^, $R$ is the universal gas constant in L·kPa·K^-1^·mol^-1^, and $T$ is the temperature inside the chamber in Kelvin. Each parameter is measured inside the chamber at $t = 0$.
+
+::: callout-note
+## Total volume = chamber + tubing + instruments
+
+Note that the total volume (Vtot) needed for the calculation of the $flux.term$, includes the volume inside the tubing and inside your instruments. Even though these volumes may seem negligible, it is important to include them, especially when comparing flux estimates measured with different instruments.
+
+The good news is, we did the research for you! Find the internal volume of each instrument compatible with the goFlux R package in this Excel spreadsheet: {{< downloadthis docs/example_auxfile.xlsx label="download" dname=example_auxfile id=auxfile-btn >}}
+:::
 
 ### Water vapor correction
 
@@ -79,7 +90,7 @@ goFlux(
 ### Arguments
 
 |  |  |
-|------------------|------------------------------------------------------|
+|----|----|
 | `dataframe` | a data.frame containing gas measurements (see `gastype` below), water vapor measurements (see `H2O_col` below) and the following columns: `UniqueID`, `Etime`, `Vtot`, `Area`, `Pcham`, `Tcham` and `flag` (see the parameters `Vtot`, `Area`, `Pcham` and `Tcham` below for more details). `chamID` may be used instead of `UniqueID`. |
 | `gastype` | character string; specifies which column should be used for the flux calculations. Must be one of the following: "CO2dry_ppm", "CH4dry_ppb", "COdry_ppb", "N2Odry_ppb", "NH3dry_ppb", "NO_ppb", "NO2_ppb" or "H2O_ppm". |
 | `H2O_col` | character string; specifies which column should be used to subtract the effect of water vapor in the chamber space. Default is `H2O_col = "H2O_ppm"`. |
