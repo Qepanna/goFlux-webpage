@@ -21,6 +21,10 @@ After import, the user can choose from two methods to define the start and end p
 -   [**Automatic identification of measurements**](manualID.qmd#sec-auto) - based on automatic recordings of chamber opening and closing from an instrument such as the LI-COR Smart Chamber or the GAIATECH Automated ECOFlux chamber, or from a reliable auxiliary file.
 -   [**Manual identification of measurements**](manualID.qmd#sec-manID) - based on `start.time`, provided separately in an auxiliary file. The function `obs.win` splits the imported data into a list of data frame (divided by `UniqueID`) and creates an observation window around the `start.time` to allow for a manual selection of the start and end points of each measurements.
 
+::: callout-tip
+After the identification of measurements, one may which to add a deadband across all measurements, crop the start or end of measurements, or apply specific modifications per measurement. To do so, look up the function [`crop.meas`](other.qmd#crop.meas).
+:::
+
 # **Automatic identification of measurements** {#sec-auto}
 
 If the imported file already contains the column `chamID` or `UniqueID`, the file is ready for [flux calculation](goFlux.qmd), as long as it also contains the necessary information for flux calculation, such as `Vtot`, `Area`, `Pcham` and `Tcham`, or that they can be provided as arguments in the `goFlux` function.

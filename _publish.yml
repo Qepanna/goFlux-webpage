@@ -1,4 +1,4 @@
 - source: project
   quarto-pub:
     - id: 526c2ef8-b62c-4d0e-844d-053ca526e907
-      url: 'https://qepanna.quarto.pub/goflux'
+      url: https://qepanna.quarto.pub/goflux

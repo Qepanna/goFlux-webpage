@@ -6,3 +6,5 @@
 /.quarto/
 /_site/
 /quarto_titlepages/
+
+**/*.quarto_ipynb
