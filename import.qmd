@@ -504,6 +504,7 @@ Each instrument has a unique function for single file import. The advantage of u
 -   [**PP-Systems**](import.qmd#sec-single-PP-System): EGM-5
 -   [**Aeris Technologies**](import.qmd#sec-single-Aeris): N~2~O/CO~2~ high accuracy analyzer and CH~4~/C~2~H~6~ natural gas detection system
 -   [**Healthy Photon**](import.qmd#sec-single-HealthyPhoton): HT8850
+-   [**Eosense**](import.qmd#sec-single-Eosense): eosMX 12-Channel Multiplexer
 -   [**GasmetPD**](import.qmd#sec-single-GasmetPD): Custom multiplexer from the University of Padova, Italy
 
 ## LI-COR {#sec-single-LICOR}
