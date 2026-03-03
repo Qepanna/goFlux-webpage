@@ -1,15 +1,16 @@
 ---
-title: "Other functions in the package goFlux"
+title: "Other tools in the package goFlux"
 format: 
   html: 
     css: styles.css
 engine: knitr
 editor: visual
+bibliography: references.bib
 ---
 
 Aside from the typical workflow of flux calculation, one may wish to estimate other parameters from gas measurements, or modify the observation window of measurements.
 
-Currently, this page only contains two complementary functions. To request more complementary functions, [open an issue on GitHub](https://github.com/Qepanna/goFlux/issues) or contact the maintainer of this package, Karelle Rheault ([karh\@ign.ku.dk](mailto:karh@ign.ku.dk){.email}), directly.
+Currently, this page only contains three complementary functions. To request more complementary functions, [open an issue on GitHub](https://github.com/Qepanna/goFlux/issues) or contact the maintainer of this package, Karelle Rheault ([karh\@ign.ku.dk](mailto:karh@ign.ku.dk){.email}), directly.
 
 ### `crop.meas` for additional modifications of the observation window {#crop.meas}
 
@@ -39,7 +40,7 @@ crop.meas(
 #### Arguments
 
 |  |  |
-|---------------|---------------------------------------------------------|
+|----|----|
 | `dataframe` | a dataframe containing gas measurements, output from import or ID functions (click.peak2 or manID). Must contain the columns `UniqueID`, `start.time`, `end.time` and `Etime`. |
 | `auxfile` | data.frame; auxiliary data frame containing the columns `UniqueID`, `crop_start`, `crop_end`, `deadband` and/or `max.obs.length`. |
 | `crop_start` | numerical; number of observations to remove at the start of the measurement. To provide a unique value per UniqueID, the column `crop_start` must be present in the auxfile and the argument must be set to `crop_start = "aux"`. |
@@ -81,6 +82,64 @@ crop.G2201i <- crop.meas(dataframe = manID.G2201i, auxfile = auxfile,
                          crop_start = 5, crop_end = 5)
 ```
 
+### `auto.deadband` for an automatic selection of deadband per measurement {#auto.deadband}
+
+Loops through multiple gas measurements and automatically define a suitable deadband per measurement.
+
+#### Usage
+
+```{r}
+#| eval: false
+#| code-copy: false
+auto.deadband(
+  dataframe,
+  gastype,
+  db.min = 0,
+  db.max = 60,
+  obs.win = 90,
+  mov.win = 10,
+  min.r2 = 0
+)
+```
+
+#### Arguments
+
+|  |  |
+|----|----|
+| `dataframe` | data.frame; output from import or ID functions. |
+| `gastype` | character string; specifies which gas column should be used to detect inflection point. Must be one of the following: "CO2dry_ppm", "CH4dry_ppb", "COdry_ppb", "N2Odry_ppb", "NH3dry_ppb", "NOdry_ppb", "NO2dry_ppb" or "H2O_ppm". |
+| `db.min` | numerical value (seconds); minimal deadband per measurement. |
+| `db.max` | numerical value (seconds); maximal deadband per measurement. |
+| `obs.win` | numerical value (seconds); maximal observation window to include in the linear models. If possible, keept at least 30 seconds between `db.max` and `obs.win` for more accurate results. |
+| `mov.win` | numerical value (seconds); time increment between `obs.win`, from chamber closure to `db.max`. |
+| `min.r2` | numerical value; minimum increase in R^2^ required to accept dropping more data points. |
+
+#### Details
+
+For each measurement, a sequence of observation window is defined from chamber closure (+ `mov.win`) to `obs.win`. For each observation window, a linear model is calculated, from which the R^2^ is extracted. The 'best' deadband is then selected at the highest R^2^.
+
+In `db.min` and `db.max`, negative values are accepted. This is especially applicable in cases where `start.time` already includes a deadband after chamber closure, and `cham.close` is not provided.
+
+Note that, `obs.win` should represent the most linear part of the measurement, at the start of the measurement. For long chamber enclosures (more than a few minutes) select a longer `obs.win` more representative of your measurements. The default value of `obs.win = 90s` is based on previous observations that the most linear part of a measurement is often found within a short period (\<2 minutes) at the start of the measurement, for small chamber sizes (\~4L) [@johannesson2024]. Similarly, the argument `mov.win` could be increased for very long chamber enclosures. Using a short `mov.win` (e.g., 1s) increases computational time, and is not recommended for very large data sets. The default value of `db.max = 60` is based on dark chamber measurements on, e.g., soils. For Reco, a longer `db.max` (e.g., 90 seconds) is recommended to take into account a recovery phase of residual photosynthesis at the start of the measurement.
+
+`min.r2` can be used to restrict longer deadbands (or minimize dropping data points). For example, if an R^2^ of 0.990 is found with a deadband of 30 seconds, and an R^2^ of 0.992 with a deadband of 40 seconds (considering `mov.win = 10`), the best deadband is defined at 30 seconds if `min.r2 = 0.005`. By default, the highest R^2^ selects the best deadband (`min.r2 = 0`), but this may result in unnecessary loss of data points.
+
+In `gastype`, the gas species listed are the ones for which this package has been adapted. Please write to the maintainer of this package for adaptation of additional gases.
+
+#### Examples
+
+```{r}
+#| eval: false
+# Load example data
+data("manID.UGGA")
+
+# Automatically select a deadband per UniqueID
+auto_db <- auto.deadband(manID.UGGA, "CO2dry_ppm")
+
+# Apply changes to dataframe using crop.meas
+crop_UGGA <- crop.meas(manID.UGGA, auto_db, deadband = "aux")
+```
+
 ### `iso.comp` for isotopic composition determination
 
 Extracts the y-intercept of the regression between the isotope ratios (13C, 15N or 18O) plotted againts the inverse of the gas concentration (CO~2~ or N~2~O).
@@ -104,7 +163,7 @@ iso.comp(
 #### Arguments
 
 |  |  |
-|-------------|-------------------------------------------------------------|
+|----|----|
 | `dataframe` | a data.frame containing measurements of isotopic fractions of CO~2~ or N~2~O and a `UniqueID` (or `chamID`) per measurements. |
 | `CO2dry_ppm`, `delta_13C` | character string; specifies which columns should be used for CO~2~ measurements, and the delta 13C, respectively. |
 | `N2Odry_ppb`, `delta_15N`, `delta_18O` | character string; specifies which columns should be used for N~2~O measurements, the delta 15N and the delta 18O, respectively. |
